@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.responses import FileResponse
 import pip
-pip install psycopg2-binary
+pip3 install psycopg2
 # import mysql.connector
 import psycopg2
 import os
