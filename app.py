@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.responses import FileResponse
-import mysql.connector
+# import mysql.connector
+import psycopg2
 import os
 import tempfile
 import logging
@@ -24,7 +25,8 @@ azure_user = "example_admin"
 azure_password = "azureExamplePassword!789"
 
 def create_aws_connection():
-    connection = mysql.connector.connect(
+    # connection = mysql.connector.connect(
+    connection = psycopg2.connect(
         host=aws_host,
         user=aws_user,
         password=aws_password,
