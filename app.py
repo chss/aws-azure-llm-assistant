@@ -15,7 +15,7 @@ app = FastAPI()
 aws_database_name = "example_schema"
 aws_host = "database-2.cfi2gcmskckg.us-east-2.rds.amazonaws.com"
 aws_user = "postgres"
-aws_password = "postgres"
+aws_password = "nemsisdbpwd"
 
 # Database connection details for Azure
 azure_database_name = "example_db"
