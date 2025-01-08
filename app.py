@@ -33,6 +33,8 @@ def create_aws_connection():
         password=aws_password,
         database=aws_database_name
     )
+    if connection:
+        print("Connected to PostgreSQL successfully!")
     return connection
 
 def create_azure_connection():
