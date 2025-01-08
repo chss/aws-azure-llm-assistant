@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.responses import FileResponse
 # import pip
-# import mysql.connector
+import mysql.connector
 import psycopg2
 import os
 import tempfile
@@ -14,10 +14,10 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 
 # Database connection details for AWS
-aws_database_name = "nemsis"
-aws_host = "database-2.cfi2gcmskckg.us-east-2.rds.amazonaws.com"
-aws_user = "postgres"
-aws_password = "nemsisdbpwd"
+aws_database_name = "mysqldb"
+aws_host = "database-3.cfi2gcmskckg.us-east-2.rds.amazonaws.com"
+aws_user = "admin"
+aws_password = "mysqldbpwd"
 
 # Database connection details for Azure
 azure_database_name = "example_db"
