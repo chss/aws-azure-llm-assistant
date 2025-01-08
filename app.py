@@ -26,8 +26,8 @@ azure_user = "example_admin"
 azure_password = "azureExamplePassword!789"
 
 def create_aws_connection():
-    # connection = mysql.connector.connect(
-    connection = psycopg2.connect(
+    connection = mysql.connector.connect(
+    #connection = psycopg2.connect(
         host=aws_host,
         user=aws_user,
         password=aws_password,
