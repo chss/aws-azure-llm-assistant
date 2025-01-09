@@ -14,15 +14,15 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 
 # Database connection details for AWS
-aws_database_name = "mysqldb"
-aws_host = "database-3.cfi2gcmskckg.us-east-2.rds.amazonaws.com"
-aws_user = "admin"
-aws_password = "mysqldbpwd"
+#aws_database_name = "mysqldb"
+#aws_host = "database-3.cfi2gcmskckg.us-east-2.rds.amazonaws.com"
+#aws_user = "admin"
+#aws_password = "mysqldbpwd"
 
-#aws_database_name = "nemsis"
-#aws_host = "database-2.cfi2gcmskckg.us-east-2.rds.amazonaws.com"
-#aws_user = "postgres"
-#aws_password = "nemsisdbpwd"
+aws_database_name = "nemsis"
+aws_host = "database-2.cfi2gcmskckg.us-east-2.rds.amazonaws.com"
+aws_user = "postgres"
+aws_password = "nemsisdbpwd"
 
 # Database connection details for Azure
 azure_database_name = "example_db"
@@ -31,8 +31,8 @@ azure_user = "example_admin"
 azure_password = "azureExamplePassword!789"
 
 def create_aws_connection():
-    connection = mysql.connector.connect(
-    #connection = psycopg2.connect(
+    #connection = mysql.connector.connect(
+    connection = psycopg2.connect(
         host=aws_host,
         user=aws_user,
         password=aws_password,
