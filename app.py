@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.responses import FileResponse
 # import pip
 import mysql.connector
-import psycopg2
+#import psycopg2
 import os
 import tempfile
 import logging
@@ -33,7 +33,7 @@ def create_aws_connection():
         password=aws_password,
         database=aws_database_name
     )
-
+    return connection
 
 def create_azure_connection():
     connection = mysql.connector.connect(
