@@ -1,7 +1,5 @@
 from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.responses import FileResponse
-# import pip
-import mysql.connector
 import psycopg2
 import os
 import tempfile
@@ -13,91 +11,68 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-# Database connection details for AWS
-aws_database_name = "mysqldb"
-aws_host = "database-3.cfi2gcmskckg.us-east-2.rds.amazonaws.com"
-aws_user = "admin"
-aws_password = "mysqldbpwd"
+# Database connection details for AWS (example)
+aws_database_name = "nemsis"
+aws_host = "database-2.cfi2gcmskckg.us-east-2.rds.amazonaws.com"
+aws_user = "postgres"
+aws_password = "nemsisdbpwd"
 
-#aws_database_name = "nemsis"
-#aws_host = "database-2.cfi2gcmskckg.us-east-2.rds.amazonaws.com"
-#aws_user = "postgres"
-#aws_password = "nemsisdbpwd"
-
-# Database connection details for Azure
-azure_database_name = "example_db"
-azure_host = "example-server3.mysql.database.azure.com"
-azure_user = "example_admin"
-azure_password = "azureExamplePassword!789"
 
 def create_aws_connection():
-    connection = mysql.connector.connect(
-    #connection = psycopg2.connect(
-        host=aws_host,
-        user=aws_user,
-        password=aws_password,
-        database=aws_database_name
-    )
-    return connection
+    try:
+        connection = psycopg2.connect(
+            host=aws_host,
+            user=aws_user,
+            password=aws_password,
+            database=aws_database_name
+        )
+        return connection
+    except (Exception, psycopg2.Error) as error:
+        logger.error(f"Error while connecting to PostgreSQL: {error}")
+        raise HTTPException(status_code=500, detail="Error connecting to database")
 
-def create_azure_connection():
-    connection = mysql.connector.connect(
-        host=azure_host,
-        user=azure_user,
-        password=azure_password,
-        database=azure_database_name,
-        ssl_disabled=True
-    )
-    return connection
-
-def get_connection(cloud: str):
-    if cloud == "azure":
-        return create_azure_connection()
-    elif cloud == "aws":
-        return create_aws_connection()
-    else:
-        raise ValueError("Invalid cloud provider specified")
+def get_connection():
+    return create_aws_connection()
 
 @app.get("/sqlquery/")
-async def sqlquery(sqlquery: str, cloud: str, request: Request):
-    logger.debug(f"Received API call: {request.url} with cloud parameter: {cloud}")
+async def sqlquery(sqlquery: str, request: Request):
+    logger.debug(f"Received API call: {request.url}")
     try:
-        connection = get_connection(cloud)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        connection = get_connection()
+        with connection.cursor() as cursor:
+            cursor.execute(sqlquery)
+            
+            # Handle queries that return results
+            if cursor.description is not None:
+                headers = [i[0] for i in cursor.description]
+                results = cursor.fetchall()
 
-    try:
-        cursor = connection.cursor()
-        cursor.execute(sqlquery)
-        
-        # Handle queries that return results
-        if cursor.description is not None:
-            headers = [i[0] for i in cursor.description]
-            results = cursor.fetchall()
-            cursor.close()
+                # Create a temporary file
+                with tempfile.NamedTemporaryFile(delete=False, mode='w', suffix=".txt") as temp_file:
+                    temp_file.write(" | ".join(headers) + "\n")
+                    for row in results:
+                        temp_file.write(" | ".join(str(item) for item in row) + "\n")
+                    temp_file_path = temp_file.name
 
-            # Create a temporary file
-            with tempfile.NamedTemporaryFile(delete=False, mode='w', suffix=".txt") as temp_file:
-                temp_file.write(" | ".join(headers) + "\n")
-                for row in results:
-                    temp_file.write(" | ".join(str(item) for item in row) + "\n")
-                temp_file_path = temp_file.name
+                logger.debug(f"Query executed successfully, results written to {temp_file_path}")
+                # Return the file response
+                response = FileResponse(path=temp_file_path, filename="output.txt", media_type='text/plain')
+                return response
+            
+            # Handle non-SELECT queries
+            else:
+                connection.commit()
+                logger.debug("Non-SELECT query executed successfully")
+                return {"status": "Query executed successfully"}
 
-            logger.debug(f"Query executed successfully, results written to {temp_file_path}")
-            # Return the file response
-            response = FileResponse(path=temp_file_path, filename="output.txt", media_type='text/plain')
-            return response
-        
-        # Handle non-SELECT queries
-        else:
-            connection.commit()
-            cursor.close()
-            logger.debug("Non-SELECT query executed successfully")
-            return {"status": "Query executed successfully"}
+    except (Exception, psycopg2.Error) as error:
+        logger.error(f"Error executing query: {error}")
+        raise HTTPException(status_code=500, detail="Error executing SQL query")
 
     finally:
-        connection.close()
-        logger.debug("Database connection closed")
+        if connection:
+            connection.close()
+            logger.debug("Database connection closed")
 
 @app.middleware("http")
 async def remove_temp_file(request, call_next):
