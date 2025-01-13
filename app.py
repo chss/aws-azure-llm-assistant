@@ -18,7 +18,7 @@ app = FastAPI()
 #aws_password = "nemsisdbpwd"
 
 aws_database_name = "dvdrental"
-aws_host = "database-1.cfi2gcmskckg.us-east-2.rds.amazonaws.com
+aws_host = "database-1.cfi2gcmskckg.us-east-2.rds.amazonaws.com"
 aws_user = "postgres"
 aws_password = "postgresdbadmin"
 
