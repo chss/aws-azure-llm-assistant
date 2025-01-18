@@ -12,15 +12,15 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 
 # Database connection details for AWS (example)
-aws_database_name = "nemsis"
-aws_host = "database-4.cfi2gcmskckg.us-east-2.rds.amazonaws.com"
-aws_user = "postgres"
-aws_password = "nemsisdbpwd"
-
-#aws_database_name = "dvdrental"
-#aws_host = "database-1.cfi2gcmskckg.us-east-2.rds.amazonaws.com"
+#aws_database_name = "nemsis"
+#aws_host = "database-4.cfi2gcmskckg.us-east-2.rds.amazonaws.com"
 #aws_user = "postgres"
-#aws_password = "postgresdbadmin"
+#aws_password = "nemsisdbpwd"
+
+aws_database_name = "dvdrental"
+aws_host = "database-1.cfi2gcmskckg.us-east-2.rds.amazonaws.com"
+aws_user = "postgres"
+aws_password = "postgresdbadmin"
 
 def create_aws_connection():
     try:
